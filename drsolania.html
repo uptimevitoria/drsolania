@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Innseye Audio Archive // Solania O'Byrne</title>
+  <style>
+    :root {
+      --bg: #050806;
+      --card-bg: #0a110d;
+      --green-glow: #10b981;
+      --green-bright: #34d399;
+      --brass: #85724e;
+      --brass-dark: #3a3222;
+      --danger: #ef4444;
+      --text: #e2e8f0;
+      --muted: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Courier New', Courier, monospace;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 14px 20px;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 50% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 65%),
+        radial-gradient(circle at 50% 80%, rgba(4, 47, 34, 0.25) 0%, transparent 60%);
+    }
+
+    /* Cabeçalho */
+    .header {
+      text-align: center;
+      width: 100%;
+      max-width: 440px;
+      border-bottom: 1px dashed var(--brass-dark);
+      padding-bottom: 10px;
+      margin-top: 4px;
+    }
+
+    .archive-id {
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      color: var(--brass);
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .log-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #f1f5f9;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+    }
+
+    .classification-tag {
+      font-size: 0.65rem;
+      letter-spacing: 1.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--green-bright);
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 2px 10px;
+      border-radius: 12px;
+      margin-top: 6px;
+    }
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green-bright);
+      box-shadow: 0 0 6px var(--green-bright);
+    }
+
+    /* Gabinete da Fita Cassete / Deck Analógico */
+    .deck-container {
+      width: 100%;
+      max-width: 440px;
+      background: var(--card-bg);
+      border: 1px solid #1e2d24;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 
+        0 15px 35px rgba(0, 0, 0, 0.85),
+        inset 0 0 20px rgba(0, 0, 0, 0.8),
+        0 0 20px rgba(16, 185, 129, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Fita de Áudio Estilizada com Carretéis */
+    .cassette-box {
+      background: #060a08;
+      border: 1px solid #1a2820;
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .reels-row {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px 0;
+    }
+
+    .reel {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      border: 3px dashed #334e3e;
+      background: #030504;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 10px #000;
+      transition: transform 0.1s linear;
+    }
+
+    .reel.spinning {
+      animation: spinReel 2s linear infinite;
+    }
+
+    .reel-inner {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--brass-dark);
+      border: 2px solid var(--brass);
+    }
+
+    @keyframes spinReel {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Display de Onda Analógica */
+    .wave-display {
+      width: 100%;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      background: #020403;
+      border-radius: 4px;
+      border: 1px solid #132219;
+      padding: 0 8px;
+    }
+
+    .wave-bar {
+      width: 3px;
+      height: 4px;
+      background: var(--green-bright);
+      border-radius: 2px;
+      transition: height 0.1s ease;
+      opacity: 0.35;
+    }
+
+    .wave-bar.active {
+      opacity: 0.95;
+      box-shadow: 0 0 6px var(--green-glow);
+    }
+
+    /* Barra de Progresso do Áudio */
+    .timeline-container {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .time-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    .progress-bar-wrapper {
+      width: 100%;
+      height: 8px;
+      background: #111a15;
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+      border: 1px solid #1a2c20;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #059669 0%, #34d399 100%);
+      border-radius: 4px;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+    }
+
+    /* Controles de Reprodução */
+    .controls-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+      margin-top: 4px;
+    }
+
+    .btn-control {
+      background: #111e17;
+      border: 1px solid #233b2e;
+      color: var(--text);
+      font-family: inherit;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-control:active {
+      transform: scale(0.95);
+      background: #192d22;
+    }
+
+    .btn-secondary {
+      width: 48px;
+      height: 44px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--brass);
+    }
+
+    .btn-play {
+      width: 70px;
+      height: 52px;
+      background: linear-gradient(180deg, #065f46 0%, #022c22 100%);
+      border: 1px solid var(--green-glow);
+      color: #ecfdf5;
+      font-size: 1.25rem;
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.3);
+    }
+
+    /* Bloco de Instruções em Campo */
+    .field-hint-card {
+      width: 100%;
+      max-width: 440px;
+      background: rgba(10, 17, 13, 0.75);
+      border: 1px solid var(--brass-dark);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 0.75rem;
+      line-height: 1.45;
+    }
+
+    .hint-title {
+      color: var(--brass);
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hint-body {
+      color: #94a3b8;
+    }
+
+    .highlight-green {
+      color: var(--green-bright);
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cabeçalho Institucional -->
+  <div class="header">
+    <div class="archive-id">INNSEYE ASYLUM // RECOVERED TAPE #084</div>
+    <div class="log-title">Solania O'Byrne</div>
+    <div class="classification-tag">
+      <div class="pulse-dot"></div>
+      <span>SECTION B // GENETIC LOG</span>
+    </div>
+  </div>
+
+  <!-- Gabinete do Reprodutor -->
+  <div class="deck-container">
+    
+    <!-- Cassete com Bobinas e Visualizador de Frequência -->
+    <div class="cassette-box">
+      <div class="reels-row">
+        <div class="reel" id="reelLeft"><div class="reel-inner"></div></div>
+        <div style="font-size:0.65rem; color:#4b5563; letter-spacing:1px; text-transform:uppercase;">Mayo // IRL</div>
+        <div class="reel" id="reelRight"><div class="reel-inner"></div></div>
+      </div>
+
+      <!-- Ondas Sonoras -->
+      <div class="wave-display" id="waveDisplay"></div>
+    </div>
+
+    <!-- Barra de Progresso / Tempo -->
+    <div class="timeline-container">
+      <div class="progress-bar-wrapper" id="progressContainer">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="time-info">
+        <span id="currentTime">00:00</span>
+        <span id="durationTime">01:50</span>
+      </div>
+    </div>
+
+    <!-- Controles -->
+    <div class="controls-row">
+      <!-- Recuar 10 segundos -->
+      <button class="btn-control btn-secondary" id="btnBack10" title="Back 10s">
+        -10s
+      </button>
+
+      <!-- Play / Pause -->
+      <button class="btn-control btn-play" id="btnPlay" title="Play / Pause">
+        ▶
+      </button>
+
+      <!-- Replay do Início -->
+      <button class="btn-control btn-secondary" id="btnRestart" title="Restart from beginning">
+        ↺
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Dica de Campo para o Time 1 -->
+  <div class="field-hint-card">
+    <div class="hint-title">
+      <span>✏️</span> Instructions for Team 1
+    </div>
+    <div class="hint-body">
+      1. Grab a pencil.<br>
+      2. Locate the <span class="highlight-green">Luminous Green</span> infected genes on your paper.<br>
+      3. Listen carefully to Solania and draw each infection vector.<br>
+      4. Use <strong>[-10s]</strong> or <strong>[↺]</strong> if you need to recount paces.
+    </div>
+  </div>
+
+  <!-- Tag de Áudio Nativa -->
+  <!-- Renomeie o arquivo WAV/MP3 enviado para solania.wav ou solania.mp3 -->
+  <audio id="audioSource" preload="metadata">
+    <source src="solania.wav" type="audio/wav">
+    <source src="solania.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <script>
+    const audio = document.getElementById('audioSource');
+    const btnPlay = document.getElementById('btnPlay');
+    const btnBack10 = document.getElementById('btnBack10');
+    const btnRestart = document.getElementById('btnRestart');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressFill = document.getElementById('progressFill');
+    const currentTimeDisplay = document.getElementById('currentTime');
+    const durationTimeDisplay = document.getElementById('durationTime');
+    const reelLeft = document.getElementById('reelLeft');
+    const reelRight = document.getElementById('reelRight');
+    const waveDisplay = document.getElementById('waveDisplay');
+
+    // Cria as barrinhas do visualizador de som
+    const NUM_BARS = 28;
+    const bars = [];
+    for (let i = 0; i < NUM_BARS; i++) {
+      const b = document.createElement('div');
+      b.classList.add('wave-bar');
+      waveDisplay.appendChild(b);
+      bars.push(b);
+    }
+
+    function formatTime(seconds) {
+      if (isNaN(seconds)) return "00:00";
+      const m = Math.floor(seconds / 60);
+      const s = Math.floor(seconds % 60);
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    // Atualiza metadados
+    audio.addEventListener('loadedmetadata', () => {
+      durationTimeDisplay.textContent = formatTime(audio.duration);
+    });
+
+    // Play / Pause
+    btnPlay.addEventListener('click', () => {
+      if (audio.paused) {
+        audio.play().catch(e => console.warn(e));
+        btnPlay.textContent = '❚❚';
+        setReelsActive(true);
+      } else {
+        audio.pause();
+        btnPlay.textContent = '▶';
+        setReelsActive(false);
+      }
+    });
+
+    function setReelsActive(active) {
+      reelLeft.classList.toggle('spinning', active);
+      reelRight.classList.toggle('spinning', active);
+    }
+
+    // Recuar 10 segundos
+    btnBack10.addEventListener('click', () => {
+      audio.currentTime = Math.max(0, audio.currentTime - 10);
+    });
+
+    // Reiniciar fita
+    btnRestart.addEventListener('click', () => {
+      audio.currentTime = 0;
+      audio.play().catch(e => console.warn(e));
+      btnPlay.textContent = '❚❚';
+      setReelsActive(true);
+    });
+
+    // Atualização da barra de progresso e simulação das ondas
+    audio.addEventListener('timeupdate', () => {
+      const percent = (audio.currentTime / audio.duration) * 100 || 0;
+      progressFill.style.width = percent + '%';
+      currentTimeDisplay.textContent = formatTime(audio.currentTime);
+
+      // Animação das barrinhas de frequência enquanto toca
+      if (!audio.paused) {
+        bars.forEach(b => {
+          const h = Math.floor(Math.random() * 26) + 4;
+          b.style.height = h + 'px';
+          b.classList.toggle('active', h > 10);
+        });
+      }
+    });
+
+    // Fim da reprodução
+    audio.addEventListener('ended', () => {
+      btnPlay.textContent = '▶';
+      setReelsActive(false);
+      bars.forEach(b => {
+        b.style.height = '4px';
+        b.classList.remove('active');
+      });
+    });
+
+    // Clique direto na barra de progresso (Scrubbing)
+    progressContainer.addEventListener('click', (e) => {
+      const rect = progressContainer.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const newTime = (clickX / rect.width) * audio.duration;
+      audio.currentTime = newTime;
+    });
+  </script>
+</body>
+</html>
